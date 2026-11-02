@@ -87,9 +87,9 @@
             <Grid Grid.Row="7" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto"
                   ColumnSpacing="6" RowSpacing="6">
                 <Button x:Name="DeleteButton" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                        Content="Видалити вибраний" />
+                        Content="Видалити вибраний" Click="DeleteButton_Click" />
                 <Button x:Name="ClearButton" Grid.Row="1" Grid.Column="0"
-                        Content="Очистити все" Padding="2,5" />
+                        Content="Очистити все" Padding="2,5" Click="ClearButton_Click" />
                 <Button x:Name="ValuesButton" Grid.Row="1" Grid.Column="1"
                         Content="Таблиця" Padding="2,5" />
                 <Button x:Name="SavePngButton" Grid.Row="2" Grid.Column="0"

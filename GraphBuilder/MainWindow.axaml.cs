@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -85,6 +86,7 @@ namespace GraphBuilder
 
             colorIndex = (colorIndex + 1) % colors.Length;
             graphs.Add(graph);
+            AddToList(graph);
 
             painter.XMin = xMin;
             painter.XMax = xMax;
@@ -98,6 +100,58 @@ namespace GraphBuilder
             }
 
             painter.Draw(graphs);
+        }
+
+        // Додає рядок у список графіків. Текст того самого кольору, що й графік
+        private void AddToList(Graph graph)
+        {
+            TextBlock item = new TextBlock();
+            item.Text = graph.Function.GetFormula();
+            item.Foreground = new SolidColorBrush(graph.Color);
+            item.TextWrapping = TextWrapping.Wrap;
+
+            GraphsListBox.Items.Add(item);
+            GraphsListBox.SelectedIndex = GraphsListBox.Items.Count - 1;
+        }
+
+        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            await DeleteSelectedGraph();
+        }
+
+        private async Task DeleteSelectedGraph()
+        {
+            int index = GraphsListBox.SelectedIndex;
+            if (index < 0)
+            {
+                await ShowError("Виберіть графік у списку.");
+                return;
+            }
+
+            graphs.RemoveAt(index);
+            GraphsListBox.Items.RemoveAt(index);
+            GraphsListBox.SelectedIndex = Math.Min(index, graphs.Count - 1);
+            painter.Draw(graphs);
+        }
+
+        private async void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (graphs.Count == 0)
+            {
+                await ShowError("Список графіків порожній.");
+                return;
+            }
+
+            MessageWindow window = new MessageWindow("Підтвердження", "Видалити всі графіки?", true);
+            await window.ShowDialog(this);
+
+            if (window.Result)
+            {
+                graphs.Clear();
+                GraphsListBox.Items.Clear();
+                colorIndex = 0;
+                painter.Draw(graphs);
+            }
         }
 
         private async Task ShowError(string text)
