@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GraphBuilder.HelpWindow"
+        Title="Довідка"
+        Width="560" Height="560"
+        MinWidth="420" MinHeight="360"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        KeyDown="Window_KeyDown">
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="0,10,0,0" />
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="14" RowSpacing="10" RowDefinitions="*,Auto">
+        <ScrollViewer Grid.Row="0">
+            <StackPanel Spacing="4" Margin="0,0,14,0">
+                <TextBlock Classes="title" Text="Робота з програмою" />
+                <TextBlock Text="1. Виберіть тип функції у списку. Під списком з'явиться формула." />
+                <TextBlock Text="2. Введіть коефіцієнти a, b, c. Дробові числа можна писати і з комою, і з крапкою." />
+                <TextBlock Text="3. Задайте діапазон Xmin, Xmax, крок і діапазон Ymin, Ymax." />
+                <TextBlock Text="4. Натисніть «Побудувати». Можна будувати кілька графіків, кожен матиме свій колір." />
+                <TextBlock Text="5. Щоб видалити графік, виберіть його у списку і натисніть «Видалити вибраний». Кнопка «Очистити все» видаляє всі графіки після підтвердження." />
+                <TextBlock Text="6. Кнопка «Таблиця» показує значення x та y для вибраного графіка." />
+                <TextBlock Text="7. Кнопка «Зберегти PNG» зберігає полотно як зображення, а «Зберегти TXT» зберігає таблицю вибраного графіка." />
+                <TextBlock Text="8. Коли мишка рухається над полотном, у рядку стану видно координати x та y." />
+                <TextBlock Text="Під час побудови всі графіки перераховуються для діапазону, заданого в полях." />
+
+                <TextBlock Classes="title" Text="Гарячі клавіші" />
+                <TextBlock Text="Enter — побудувати графік" />
+                <TextBlock Text="Delete — видалити вибраний графік" />
+                <TextBlock Text="F1 — відкрити довідку" />
+                <TextBlock Text="Esc — закрити діалогове вікно" />
+                <TextBlock Text="Tab — перейти до наступного поля" />
+
+                <TextBlock Classes="title" Text="Про програму" />
+                <TextBlock Text="Програмна реалізація модуля «Побудова графіків функцій»." />
+                <TextBlock Text="Курсовий проєкт з дисципліни «Технології програмування»." />
+                <TextBlock Text="Виконав: Кирик О., гр. 585-КБ." />
+            </StackPanel>
+        </ScrollViewer>
+
+        <Button Grid.Row="1" Content="Закрити" HorizontalAlignment="Right" Width="100"
+                HorizontalContentAlignment="Center" Click="CloseButton_Click" />
+    </Grid>
+</Window>

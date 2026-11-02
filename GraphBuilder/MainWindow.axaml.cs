@@ -238,6 +238,42 @@ namespace GraphBuilder
             return file.TryGetLocalPath();
         }
 
+        private async void HelpButton_Click(object sender, RoutedEventArgs e)
+        {
+            await ShowHelp();
+        }
+
+        private async Task ShowHelp()
+        {
+            HelpWindow window = new HelpWindow();
+            await window.ShowDialog(this);
+        }
+
+        // Гарячі клавіші головного вікна
+        private async void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
+                await BuildGraph();
+            }
+            else if (e.Key == Key.F1)
+            {
+                e.Handled = true;
+                await ShowHelp();
+            }
+            else if (e.Key == Key.Delete || e.Key == Key.Back)
+            {
+                // На клавіатурі Mac клавіша delete працює як Back.
+                // У полі введення ці клавіші мають стирати символи
+                if (!(e.Source is TextBox))
+                {
+                    e.Handled = true;
+                    await DeleteSelectedGraph();
+                }
+            }
+        }
+
         private async Task ShowError(string text)
         {
             MessageWindow window = new MessageWindow("Помилка", text, false);

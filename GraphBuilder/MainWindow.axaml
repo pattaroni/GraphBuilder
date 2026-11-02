@@ -4,7 +4,8 @@
         Title="Побудова графіків функцій"
         Width="1100" Height="720"
         MinWidth="820" MinHeight="680"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        KeyDown="Window_KeyDown">
 
     <Window.Styles>
         <Style Selector="Button">
@@ -84,7 +85,7 @@
 
             <ListBox x:Name="GraphsListBox" Grid.Row="6" BorderBrush="Gray" BorderThickness="1" />
 
-            <Grid Grid.Row="7" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto"
+            <Grid Grid.Row="7" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto"
                   ColumnSpacing="6" RowSpacing="6">
                 <Button x:Name="DeleteButton" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                         Content="Видалити вибраний" Click="DeleteButton_Click" />
@@ -96,6 +97,8 @@
                         Content="Зберегти PNG" Padding="2,5" Click="SavePngButton_Click" />
                 <Button x:Name="SaveTxtButton" Grid.Row="2" Grid.Column="1"
                         Content="Зберегти TXT" Padding="2,5" Click="SaveTxtButton_Click" />
+                <Button x:Name="HelpButton" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                        Content="Довідка (F1)" Click="HelpButton_Click" />
             </Grid>
         </Grid>
 
