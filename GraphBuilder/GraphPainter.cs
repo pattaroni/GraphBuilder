@@ -148,9 +148,26 @@ namespace GraphBuilder
             AddLine(0, axisY, width, axisY, Brushes.Black, 1.5);
             AddLine(axisX, 0, axisX, height, Brushes.Black, 1.5);
 
-            // Підписи осі X під віссю, а якщо внизу немає місця, то над нею
+            DrawXTicks(xTicks, axisY, zeroInX);
+            DrawYTicks(yTicks, axisX, zeroInY);
+
+            // Підпис осі y зліва від осі, бо справа стоять числа
+            double nameX = axisX - 12;
+            if (nameX < 2)
+            {
+                nameX = axisX + 40;
+            }
+            AddLabel("x", width - 12, axisY - 20);
+            AddLabel("y", nameX, 0);
+        }
+
+        private void DrawXTicks(List<double> xTicks, double axisY, bool zeroInX)
+        {
+            double width = canvas.Bounds.Width;
+
+            // Підписи під віссю, а якщо внизу немає місця, то над нею
             double labelY = axisY + 5;
-            if (labelY > height - 20)
+            if (labelY > canvas.Bounds.Height - 20)
             {
                 labelY = axisY - 20;
             }
@@ -169,18 +186,25 @@ namespace GraphBuilder
                 labelX = Math.Clamp(labelX, 2, Math.Max(2, width - text.Length * 7));
                 AddLabel(text, labelX, labelY);
             }
+        }
 
-            // Підписи осі Y справа від осі, а якщо там немає місця, то зліва
+        private void DrawYTicks(List<double> yTicks, double axisX, bool zeroInY)
+        {
+            double width = canvas.Bounds.Width;
+            double height = canvas.Bounds.Height;
+
             foreach (double y in yTicks)
             {
                 double screenY = ToScreenY(y);
                 AddLine(axisX - 4, screenY, axisX + 4, screenY, Brushes.Black, 1);
 
+                // Нуль уже підписаний на осі X
                 if (y == 0 && zeroInY)
                 {
                     continue;
                 }
 
+                // Підписи справа від осі, а якщо там немає місця, то зліва
                 string text = FormatTick(y);
                 double labelX = axisX + 7;
                 if (labelX > width - 50)
@@ -189,9 +213,6 @@ namespace GraphBuilder
                 }
                 AddLabel(text, labelX, Math.Clamp(screenY - 8, 0, Math.Max(0, height - 16)));
             }
-
-            AddLabel("x", width - 12, axisY - 20);
-            AddLabel("y", axisX + 7, 0);
         }
 
         // Кожен суцільний шматок графіка малюємо окремою лінією
