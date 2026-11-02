@@ -2,5 +2,112 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="GraphBuilder.MainWindow"
         Title="Побудова графіків функцій"
-        Width="1100" Height="720">
+        Width="1100" Height="720"
+        MinWidth="820" MinHeight="680"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,Auto" ColumnDefinitions="260,*">
+
+        <!-- Панель з полями та кнопками -->
+        <Grid Grid.Row="0" Grid.Column="0" Margin="10" RowSpacing="6"
+              RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
+
+            <TextBlock Grid.Row="0" Text="Функція:" />
+
+            <ComboBox x:Name="FunctionComboBox" Grid.Row="1" SelectedIndex="0"
+                      HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="Лінійна" />
+                <ComboBoxItem Content="Квадратична" />
+                <ComboBoxItem Content="Кубічна" />
+                <ComboBoxItem Content="Синус" />
+                <ComboBoxItem Content="Косинус" />
+                <ComboBoxItem Content="Тангенс" />
+                <ComboBoxItem Content="Гіпербола" />
+                <ComboBoxItem Content="Показникова" />
+                <ComboBoxItem Content="Логарифмічна" />
+                <ComboBoxItem Content="Корінь" />
+            </ComboBox>
+
+            <TextBlock x:Name="FormulaText" Grid.Row="2" FontWeight="SemiBold"
+                       TextWrapping="Wrap" />
+
+            <Grid Grid.Row="3" ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto"
+                  ColumnSpacing="6" RowSpacing="4">
+
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <TextBlock Text="a" />
+                    <TextBox x:Name="ATextBox" Text="1" />
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <TextBlock Text="b" />
+                    <TextBox x:Name="BTextBox" Text="1" />
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="2">
+                    <TextBlock Text="c" />
+                    <TextBox x:Name="CTextBox" Text="0" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="0">
+                    <TextBlock Text="Xmin" />
+                    <TextBox x:Name="XMinTextBox" Text="-10" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1">
+                    <TextBlock Text="Xmax" />
+                    <TextBox x:Name="XMaxTextBox" Text="10" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2">
+                    <TextBlock Text="Крок" />
+                    <TextBox x:Name="StepTextBox" Text="0.1" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Grid.Column="0">
+                    <TextBlock Text="Ymin" />
+                    <TextBox x:Name="YMinTextBox" Text="-10" />
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="1">
+                    <TextBlock Text="Ymax" />
+                    <TextBox x:Name="YMaxTextBox" Text="10" />
+                </StackPanel>
+            </Grid>
+
+            <Button x:Name="BuildButton" Grid.Row="4" Content="Побудувати" />
+
+            <TextBlock Grid.Row="5" Text="Побудовані графіки:" />
+
+            <ListBox x:Name="GraphsListBox" Grid.Row="6" BorderBrush="Gray" BorderThickness="1" />
+
+            <Grid Grid.Row="7" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto"
+                  ColumnSpacing="6" RowSpacing="6">
+                <Button x:Name="DeleteButton" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                        Content="Видалити вибраний" />
+                <Button x:Name="ClearButton" Grid.Row="1" Grid.Column="0"
+                        Content="Очистити все" Padding="2,5" />
+                <Button x:Name="ValuesButton" Grid.Row="1" Grid.Column="1"
+                        Content="Таблиця" Padding="2,5" />
+                <Button x:Name="SavePngButton" Grid.Row="2" Grid.Column="0"
+                        Content="Зберегти PNG" Padding="2,5" />
+                <Button x:Name="SaveTxtButton" Grid.Row="2" Grid.Column="1"
+                        Content="Зберегти TXT" Padding="2,5" />
+            </Grid>
+        </Grid>
+
+        <!-- Полотно графіка -->
+        <Border Grid.Row="0" Grid.Column="1" Margin="0,10,10,10"
+                BorderBrush="Gray" BorderThickness="1">
+            <Canvas x:Name="GraphCanvas" Background="White" ClipToBounds="True" />
+        </Border>
+
+        <!-- Рядок стану -->
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                Background="#EEEEEE" Padding="10,4">
+            <TextBlock x:Name="StatusText" Text="Готово" />
+        </Border>
+    </Grid>
 </Window>
