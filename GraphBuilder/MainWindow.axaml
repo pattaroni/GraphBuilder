@@ -77,7 +77,8 @@
                 </StackPanel>
             </Grid>
 
-            <Button x:Name="BuildButton" Grid.Row="4" Content="Побудувати" />
+            <Button x:Name="BuildButton" Grid.Row="4" Content="Побудувати"
+                    Click="BuildButton_Click" />
 
             <TextBlock Grid.Row="5" Text="Побудовані графіки:" />
 

@@ -44,6 +44,11 @@ namespace GraphBuilder
 
             DrawGrid(xTicks, yTicks);
             DrawAxes(xTicks, yTicks);
+
+            foreach (Graph graph in graphs)
+            {
+                DrawGraph(graph);
+            }
         }
 
         // Переведення координат функції в пікселі полотна і назад
@@ -187,6 +192,28 @@ namespace GraphBuilder
 
             AddLabel("x", width - 12, axisY - 20);
             AddLabel("y", axisX + 7, 0);
+        }
+
+        // Кожен суцільний шматок графіка малюємо окремою лінією
+        private void DrawGraph(Graph graph)
+        {
+            SolidColorBrush brush = new SolidColorBrush(graph.Color);
+            List<List<Point>> segments = graph.GetSegments(YMin, YMax);
+
+            foreach (List<Point> segment in segments)
+            {
+                List<Point> screenPoints = new List<Point>();
+                foreach (Point point in segment)
+                {
+                    screenPoints.Add(new Point(ToScreenX(point.X), ToScreenY(point.Y)));
+                }
+
+                Polyline line = new Polyline();
+                line.Points = screenPoints;
+                line.Stroke = brush;
+                line.StrokeThickness = 2;
+                canvas.Children.Add(line);
+            }
         }
 
         private string FormatTick(double value)
