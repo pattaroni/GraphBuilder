@@ -16,7 +16,7 @@ namespace GraphBuilder
             using (RenderTargetBitmap bitmap = new RenderTargetBitmap(new PixelSize(width, height), new Vector(96, 96)))
             {
                 bitmap.Render(canvas);
-                bitmap.Save(path);
+                bitmap.Save(path, new PngBitmapEncoderOptions());
             }
         }
 
