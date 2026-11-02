@@ -93,9 +93,9 @@
                 <Button x:Name="ValuesButton" Grid.Row="1" Grid.Column="1"
                         Content="Таблиця" Padding="2,5" Click="ValuesButton_Click" />
                 <Button x:Name="SavePngButton" Grid.Row="2" Grid.Column="0"
-                        Content="Зберегти PNG" Padding="2,5" />
+                        Content="Зберегти PNG" Padding="2,5" Click="SavePngButton_Click" />
                 <Button x:Name="SaveTxtButton" Grid.Row="2" Grid.Column="1"
-                        Content="Зберегти TXT" Padding="2,5" />
+                        Content="Зберегти TXT" Padding="2,5" Click="SaveTxtButton_Click" />
             </Grid>
         </Grid>
 

@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using GraphBuilder.Functions;
 
 namespace GraphBuilder
@@ -167,6 +168,74 @@ namespace GraphBuilder
 
             ValuesWindow window = new ValuesWindow(graphs[index]);
             await window.ShowDialog(this);
+        }
+
+        private async void SavePngButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (graphs.Count == 0)
+            {
+                await ShowError("Немає побудованих графіків.");
+                return;
+            }
+
+            try
+            {
+                string path = await AskSavePath("Зберегти графік", "graph", "png", "Зображення PNG");
+                if (path != null)
+                {
+                    FileHelper.SavePng(GraphCanvas, path);
+                    StatusText.Text = "Графік збережено";
+                }
+            }
+            catch (Exception)
+            {
+                await ShowError("Не вдалося зберегти файл. Перевірте шлях і права доступу.");
+            }
+        }
+
+        private async void SaveTxtButton_Click(object sender, RoutedEventArgs e)
+        {
+            int index = GraphsListBox.SelectedIndex;
+            if (index < 0)
+            {
+                await ShowError("Виберіть графік у списку.");
+                return;
+            }
+
+            try
+            {
+                string path = await AskSavePath("Зберегти таблицю значень", "table", "txt", "Текстовий файл");
+                if (path != null)
+                {
+                    FileHelper.SaveTable(graphs[index], path);
+                    StatusText.Text = "Таблицю збережено";
+                }
+            }
+            catch (Exception)
+            {
+                await ShowError("Не вдалося зберегти файл. Перевірте шлях і права доступу.");
+            }
+        }
+
+        // Діалог збереження. Повертає шлях до файлу або null, якщо натиснули «Скасувати»
+        private async Task<string> AskSavePath(string title, string fileName, string extension, string typeName)
+        {
+            FilePickerFileType fileType = new FilePickerFileType(typeName);
+            fileType.Patterns = new List<string> { "*." + extension };
+
+            FilePickerSaveOptions options = new FilePickerSaveOptions();
+            options.Title = title;
+            options.SuggestedFileName = fileName;
+            options.DefaultExtension = extension;
+            options.FileTypeChoices = new List<FilePickerFileType> { fileType };
+
+            IStorageFile file = await StorageProvider.SaveFilePickerAsync(options);
+            if (file == null)
+            {
+                return null;
+            }
+
+            return file.TryGetLocalPath();
         }
 
         private async Task ShowError(string text)
