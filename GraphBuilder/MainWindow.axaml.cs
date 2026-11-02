@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Globalization;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -20,20 +20,69 @@ namespace GraphBuilder
         {
             InitializeComponent();
             painter = new GraphPainter(GraphCanvas);
+
+            // Підписуємось тут, а не в axaml, бо під час завантаження розмітки
+            // поля ще не створені, а обробник до них звертається
+            FunctionComboBox.SelectionChanged += FunctionComboBox_SelectionChanged;
+            ATextBox.TextChanged += Coefficient_TextChanged;
+            BTextBox.TextChanged += Coefficient_TextChanged;
+            CTextBox.TextChanged += Coefficient_TextChanged;
+
+            UpdateFormula();
         }
 
-        private void BuildButton_Click(object sender, RoutedEventArgs e)
+        private async void BuildButton_Click(object sender, RoutedEventArgs e)
         {
-            double a = double.Parse(ATextBox.Text, CultureInfo.InvariantCulture);
-            double b = double.Parse(BTextBox.Text, CultureInfo.InvariantCulture);
-            double c = double.Parse(CTextBox.Text, CultureInfo.InvariantCulture);
-            double xMin = double.Parse(XMinTextBox.Text, CultureInfo.InvariantCulture);
-            double xMax = double.Parse(XMaxTextBox.Text, CultureInfo.InvariantCulture);
-            double step = double.Parse(StepTextBox.Text, CultureInfo.InvariantCulture);
-            double yMin = double.Parse(YMinTextBox.Text, CultureInfo.InvariantCulture);
-            double yMax = double.Parse(YMaxTextBox.Text, CultureInfo.InvariantCulture);
+            await BuildGraph();
+        }
 
-            Graph graph = new Graph(CreateFunction(a, b, c), colors[colorIndex]);
+        private async Task BuildGraph()
+        {
+            TextBox[] boxes = { ATextBox, BTextBox, CTextBox, XMinTextBox, XMaxTextBox, StepTextBox, YMinTextBox, YMaxTextBox };
+            string[] names = { "a", "b", "c", "Xmin", "Xmax", "Крок", "Ymin", "Ymax" };
+            double[] values = new double[boxes.Length];
+
+            for (int i = 0; i < boxes.Length; i++)
+            {
+                // Неактивне поле не перевіряємо, бо функції воно не потрібне
+                if (!boxes[i].IsEnabled)
+                {
+                    continue;
+                }
+
+                string error = InputHelper.CheckNumber(boxes[i].Text, names[i]);
+                if (error != null)
+                {
+                    await ShowError(error);
+                    boxes[i].Focus();
+                    return;
+                }
+
+                InputHelper.TryParseNumber(boxes[i].Text, out values[i]);
+            }
+
+            double xMin = values[3];
+            double xMax = values[4];
+            double step = values[5];
+            double yMin = values[6];
+            double yMax = values[7];
+
+            string rangeError = InputHelper.CheckRange(xMin, xMax, step, yMin, yMax);
+            if (rangeError != null)
+            {
+                await ShowError(rangeError);
+                return;
+            }
+
+            Graph graph = new Graph(CreateFunction(values[0], values[1], values[2]), colors[colorIndex]);
+            graph.CalculatePoints(xMin, xMax, step);
+
+            if (!graph.HasValidPoints())
+            {
+                await ShowError("Функція не визначена на вибраному діапазоні X.");
+                return;
+            }
+
             colorIndex = (colorIndex + 1) % colors.Length;
             graphs.Add(graph);
 
@@ -49,6 +98,51 @@ namespace GraphBuilder
             }
 
             painter.Draw(graphs);
+        }
+
+        private async Task ShowError(string text)
+        {
+            MessageWindow window = new MessageWindow("Помилка", text, false);
+            await window.ShowDialog(this);
+        }
+
+        // Показує формулу з підставленими коефіцієнтами
+        private void UpdateFormula()
+        {
+            // Лінійній функції коефіцієнт c не потрібен
+            CTextBox.IsEnabled = FunctionComboBox.SelectedIndex != 0;
+
+            double a;
+            double b;
+            double c = 0;
+            bool correct = InputHelper.TryParseNumber(ATextBox.Text, out a);
+            if (!InputHelper.TryParseNumber(BTextBox.Text, out b))
+            {
+                correct = false;
+            }
+            if (CTextBox.IsEnabled && !InputHelper.TryParseNumber(CTextBox.Text, out c))
+            {
+                correct = false;
+            }
+
+            if (correct)
+            {
+                FormulaText.Text = CreateFunction(a, b, c).GetFormula();
+            }
+            else
+            {
+                FormulaText.Text = "Некоректні коефіцієнти";
+            }
+        }
+
+        private void FunctionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateFormula();
+        }
+
+        private void Coefficient_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateFormula();
         }
 
         // Створює функцію за вибраним пунктом списку

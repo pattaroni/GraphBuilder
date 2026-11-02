@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GraphBuilder.MessageWindow"
+        Title="Повідомлення"
+        SizeToContent="WidthAndHeight"
+        MinWidth="320" MaxWidth="460"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+
+    <StackPanel Margin="16" Spacing="16">
+        <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button x:Name="OkButton" Content="OK" Width="80"
+                    HorizontalContentAlignment="Center" Click="OkButton_Click" />
+            <Button x:Name="YesButton" Content="Так" Width="80"
+                    HorizontalContentAlignment="Center" Click="YesButton_Click" />
+            <Button x:Name="NoButton" Content="Ні" Width="80"
+                    HorizontalContentAlignment="Center" Click="NoButton_Click" />
+        </StackPanel>
+    </StackPanel>
+</Window>
