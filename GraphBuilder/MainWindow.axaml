@@ -91,7 +91,7 @@
                 <Button x:Name="ClearButton" Grid.Row="1" Grid.Column="0"
                         Content="Очистити все" Padding="2,5" Click="ClearButton_Click" />
                 <Button x:Name="ValuesButton" Grid.Row="1" Grid.Column="1"
-                        Content="Таблиця" Padding="2,5" />
+                        Content="Таблиця" Padding="2,5" Click="ValuesButton_Click" />
                 <Button x:Name="SavePngButton" Grid.Row="2" Grid.Column="0"
                         Content="Зберегти PNG" Padding="2,5" />
                 <Button x:Name="SaveTxtButton" Grid.Row="2" Grid.Column="1"

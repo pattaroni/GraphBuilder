@@ -156,6 +156,19 @@ namespace GraphBuilder
             }
         }
 
+        private async void ValuesButton_Click(object sender, RoutedEventArgs e)
+        {
+            int index = GraphsListBox.SelectedIndex;
+            if (index < 0)
+            {
+                await ShowError("Виберіть графік у списку.");
+                return;
+            }
+
+            ValuesWindow window = new ValuesWindow(graphs[index]);
+            await window.ShowDialog(this);
+        }
+
         private async Task ShowError(string text)
         {
             MessageWindow window = new MessageWindow("Помилка", text, false);

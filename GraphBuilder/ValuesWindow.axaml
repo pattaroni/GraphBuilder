@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GraphBuilder.ValuesWindow"
+        Title="Таблиця значень"
+        Width="420" Height="520"
+        MinWidth="340" MinHeight="300"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        KeyDown="Window_KeyDown">
+
+    <Window.Styles>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="8,2" />
+            <Setter Property="MinHeight" Value="0" />
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="10" RowSpacing="6" RowDefinitions="Auto,Auto,*,Auto">
+        <TextBlock x:Name="FormulaText" Grid.Row="0" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <TextBlock x:Name="HeaderText" Grid.Row="1" Margin="8,0,0,0"
+                   FontFamily="Menlo, Consolas, Courier New, monospace" FontWeight="SemiBold" />
+        <ListBox x:Name="ValuesListBox" Grid.Row="2" BorderBrush="Gray" BorderThickness="1"
+                 FontFamily="Menlo, Consolas, Courier New, monospace" />
+        <Button Grid.Row="3" Content="Закрити" HorizontalAlignment="Right" Width="100"
+                HorizontalContentAlignment="Center" Click="CloseButton_Click" />
+    </Grid>
+</Window>
