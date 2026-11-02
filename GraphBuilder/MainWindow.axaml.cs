@@ -42,27 +42,11 @@ namespace GraphBuilder
 
         private async Task BuildGraph()
         {
-            TextBox[] boxes = { ATextBox, BTextBox, CTextBox, XMinTextBox, XMaxTextBox, StepTextBox, YMinTextBox, YMaxTextBox };
-            string[] names = { "a", "b", "c", "Xmin", "Xmax", "Крок", "Ymin", "Ymax" };
-            double[] values = new double[boxes.Length];
-
-            for (int i = 0; i < boxes.Length; i++)
+            double[] values = new double[8];
+            bool correct = await ReadFields(values);
+            if (!correct)
             {
-                // Неактивне поле не перевіряємо, бо функції воно не потрібне
-                if (!boxes[i].IsEnabled)
-                {
-                    continue;
-                }
-
-                string error = InputHelper.CheckNumber(boxes[i].Text, names[i]);
-                if (error != null)
-                {
-                    await ShowError(error);
-                    boxes[i].Focus();
-                    return;
-                }
-
-                InputHelper.TryParseNumber(boxes[i].Text, out values[i]);
+                return;
             }
 
             double xMin = values[3];
@@ -103,6 +87,35 @@ namespace GraphBuilder
             }
 
             painter.Draw(graphs);
+        }
+
+        // Читає поля в масив у порядку: a, b, c, Xmin, Xmax, крок, Ymin, Ymax.
+        // Якщо поле заповнене неправильно, показує помилку і повертає false
+        private async Task<bool> ReadFields(double[] values)
+        {
+            TextBox[] boxes = { ATextBox, BTextBox, CTextBox, XMinTextBox, XMaxTextBox, StepTextBox, YMinTextBox, YMaxTextBox };
+            string[] names = { "a", "b", "c", "Xmin", "Xmax", "Крок", "Ymin", "Ymax" };
+
+            for (int i = 0; i < boxes.Length; i++)
+            {
+                // Неактивне поле не перевіряємо, бо функції воно не потрібне
+                if (!boxes[i].IsEnabled)
+                {
+                    continue;
+                }
+
+                string error = InputHelper.CheckNumber(boxes[i].Text, names[i]);
+                if (error != null)
+                {
+                    await ShowError(error);
+                    boxes[i].Focus();
+                    return false;
+                }
+
+                InputHelper.TryParseNumber(boxes[i].Text, out values[i]);
+            }
+
+            return true;
         }
 
         // Додає рядок у список графіків. Текст того самого кольору, що й графік
