@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using GraphBuilder.Functions;
@@ -225,6 +227,20 @@ namespace GraphBuilder
                 default:
                     return new RootFunction(a, b, c);
             }
+        }
+
+        // Координати курсора в рядку стану
+        private void GraphCanvas_PointerMoved(object sender, PointerEventArgs e)
+        {
+            Point position = e.GetPosition(GraphCanvas);
+            double x = painter.ToWorldX(position.X);
+            double y = painter.ToWorldY(position.Y);
+            StatusText.Text = "x = " + InputHelper.FormatNumber(x) + "    y = " + InputHelper.FormatNumber(y);
+        }
+
+        private void GraphCanvas_PointerExited(object sender, PointerEventArgs e)
+        {
+            StatusText.Text = "Готово";
         }
 
         // При зміні розміру вікна перемальовуємо полотно
