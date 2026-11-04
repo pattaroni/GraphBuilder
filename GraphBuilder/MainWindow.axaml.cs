@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -34,16 +33,16 @@ namespace GraphBuilder
             UpdateFormula();
         }
 
-        private async void BuildButton_Click(object sender, RoutedEventArgs e)
+        private void BuildButton_Click(object sender, RoutedEventArgs e)
         {
-            await BuildGraph();
+            BuildGraph();
         }
 
-        private async Task BuildGraph()
+        private void BuildGraph()
         {
+            // Порядок полів: a, b, c, Xmin, Xmax, крок, Ymin, Ymax
             double[] values = new double[8];
-            bool correct = await ReadFields(values);
-            if (!correct)
+            if (!ReadFields(values))
             {
                 return;
             }
@@ -54,10 +53,10 @@ namespace GraphBuilder
             double yMin = values[6];
             double yMax = values[7];
 
-            string rangeError = InputHelper.CheckRange(xMin, xMax, step, yMin, yMax);
-            if (rangeError != null)
+            string error = InputHelper.CheckRange(xMin, xMax, step, yMin, yMax);
+            if (error != null)
             {
-                await ShowError(rangeError);
+                ShowError(error);
                 return;
             }
 
@@ -66,80 +65,76 @@ namespace GraphBuilder
 
             if (!graph.HasValidPoints())
             {
-                await ShowError("Функція не визначена на вибраному діапазоні X.");
+                ShowError("Функція не визначена на вибраному діапазоні X.");
                 return;
             }
 
             colorIndex = (colorIndex + 1) % colors.Length;
             graphs.Add(graph);
-            AddToList(graph);
+
+            // Рядок у списку того самого кольору, що й графік
+            TextBlock item = new TextBlock();
+            item.Text = graph.Function.GetFormula();
+            item.Foreground = new SolidColorBrush(graph.Color);
+            GraphsListBox.Items.Add(item);
+            GraphsListBox.SelectedIndex = GraphsListBox.Items.Count - 1;
+
+            // Діапазон міг змінитись, тому перераховуємо всі графіки
+            foreach (Graph g in graphs)
+            {
+                g.CalculatePoints(xMin, xMax, step);
+            }
 
             painter.XMin = xMin;
             painter.XMax = xMax;
             painter.YMin = yMin;
             painter.YMax = yMax;
-
-            // Діапазон міг змінитись, тому перераховуємо всі графіки
-            foreach (Graph item in graphs)
-            {
-                item.CalculatePoints(xMin, xMax, step);
-            }
-
             painter.Draw(graphs);
         }
 
-        // Читає поля в масив у порядку: a, b, c, Xmin, Xmax, крок, Ymin, Ymax.
-        // Якщо поле заповнене неправильно, показує помилку і повертає false
-        private async Task<bool> ReadFields(double[] values)
+        // Читає числа з полів. Якщо поле заповнене неправильно, показує помилку і повертає false
+        private bool ReadFields(double[] values)
         {
             TextBox[] boxes = { ATextBox, BTextBox, CTextBox, XMinTextBox, XMaxTextBox, StepTextBox, YMinTextBox, YMaxTextBox };
             string[] names = { "a", "b", "c", "Xmin", "Xmax", "Крок", "Ymin", "Ymax" };
 
             for (int i = 0; i < boxes.Length; i++)
             {
-                // Неактивне поле не перевіряємо, бо функції воно не потрібне
+                // Неактивне поле функції не потрібне
                 if (!boxes[i].IsEnabled)
                 {
                     continue;
                 }
 
-                string error = InputHelper.CheckNumber(boxes[i].Text, names[i]);
-                if (error != null)
+                if (string.IsNullOrWhiteSpace(boxes[i].Text))
                 {
-                    await ShowError(error);
+                    ShowError("Поле «" + names[i] + "» порожнє. Введіть число.");
                     boxes[i].Focus();
                     return false;
                 }
 
-                InputHelper.TryParseNumber(boxes[i].Text, out values[i]);
+                if (!InputHelper.TryParseNumber(boxes[i].Text, out values[i]))
+                {
+                    ShowError("У полі «" + names[i] + "» має бути число.");
+                    boxes[i].Focus();
+                    return false;
+                }
             }
 
             return true;
         }
 
-        // Додає рядок у список графіків. Текст того самого кольору, що й графік
-        private void AddToList(Graph graph)
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            TextBlock item = new TextBlock();
-            item.Text = graph.Function.GetFormula();
-            item.Foreground = new SolidColorBrush(graph.Color);
-            item.TextWrapping = TextWrapping.Wrap;
-
-            GraphsListBox.Items.Add(item);
-            GraphsListBox.SelectedIndex = GraphsListBox.Items.Count - 1;
+            DeleteSelectedGraph();
         }
 
-        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
-        {
-            await DeleteSelectedGraph();
-        }
-
-        private async Task DeleteSelectedGraph()
+        private void DeleteSelectedGraph()
         {
             int index = GraphsListBox.SelectedIndex;
             if (index < 0)
             {
-                await ShowError("Виберіть графік у списку.");
+                ShowError("Виберіть графік у списку.");
                 return;
             }
 
@@ -149,11 +144,12 @@ namespace GraphBuilder
             painter.Draw(graphs);
         }
 
+        // Тут потрібен await, щоб дочекатися відповіді Так/Ні
         private async void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             if (graphs.Count == 0)
             {
-                await ShowError("Список графіків порожній.");
+                ShowError("Список графіків порожній.");
                 return;
             }
 
@@ -169,12 +165,12 @@ namespace GraphBuilder
             }
         }
 
-        private async void HelpButton_Click(object sender, RoutedEventArgs e)
+        private void HelpButton_Click(object sender, RoutedEventArgs e)
         {
-            await ShowHelp();
+            ShowHelp();
         }
 
-        private async Task ShowHelp()
+        private void ShowHelp()
         {
             string text = "Виберіть функцію, введіть коефіцієнти і діапазон, натисніть «Побудувати». "
                 + "Можна будувати кілька графіків, кожен своїм кольором. "
@@ -187,38 +183,38 @@ namespace GraphBuilder
                 + "Виконав: Кирик О., гр. 585-КБ.";
 
             MessageWindow window = new MessageWindow("Довідка", text, false);
-            await window.ShowDialog(this);
+            window.ShowDialog(this);
+        }
+
+        private void ShowError(string text)
+        {
+            MessageWindow window = new MessageWindow("Помилка", text, false);
+            window.ShowDialog(this);
         }
 
         // Гарячі клавіші головного вікна
-        private async void Window_KeyDown(object sender, KeyEventArgs e)
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
                 e.Handled = true;
-                await BuildGraph();
+                BuildGraph();
             }
             else if (e.Key == Key.F1)
             {
                 e.Handled = true;
-                await ShowHelp();
+                ShowHelp();
             }
             else if (e.Key == Key.Delete || e.Key == Key.Back)
             {
-                // На клавіатурі Mac клавіша delete працює як Back.
+                // На Mac клавіша delete працює як Back.
                 // У полі введення ці клавіші мають стирати символи
                 if (!(e.Source is TextBox))
                 {
                     e.Handled = true;
-                    await DeleteSelectedGraph();
+                    DeleteSelectedGraph();
                 }
             }
-        }
-
-        private async Task ShowError(string text)
-        {
-            MessageWindow window = new MessageWindow("Помилка", text, false);
-            await window.ShowDialog(this);
         }
 
         // Показує формулу з підставленими коефіцієнтами
@@ -227,18 +223,12 @@ namespace GraphBuilder
             // Лінійній функції коефіцієнт c не потрібен
             CTextBox.IsEnabled = FunctionComboBox.SelectedIndex != 0;
 
-            double a;
-            double b;
+            double a = 0;
+            double b = 0;
             double c = 0;
-            bool correct = InputHelper.TryParseNumber(ATextBox.Text, out a);
-            if (!InputHelper.TryParseNumber(BTextBox.Text, out b))
-            {
-                correct = false;
-            }
-            if (CTextBox.IsEnabled && !InputHelper.TryParseNumber(CTextBox.Text, out c))
-            {
-                correct = false;
-            }
+            bool correct = InputHelper.TryParseNumber(ATextBox.Text, out a)
+                && InputHelper.TryParseNumber(BTextBox.Text, out b)
+                && (!CTextBox.IsEnabled || InputHelper.TryParseNumber(CTextBox.Text, out c));
 
             if (correct)
             {
@@ -292,9 +282,9 @@ namespace GraphBuilder
         private void GraphCanvas_PointerMoved(object sender, PointerEventArgs e)
         {
             Point position = e.GetPosition(GraphCanvas);
-            double x = painter.ToWorldX(position.X);
-            double y = painter.ToWorldY(position.Y);
-            StatusText.Text = "x = " + InputHelper.FormatNumber(x) + "    y = " + InputHelper.FormatNumber(y);
+            double x = Math.Round(painter.ToWorldX(position.X), 2);
+            double y = Math.Round(painter.ToWorldY(position.Y), 2);
+            StatusText.Text = "x = " + x + "    y = " + y;
         }
 
         private void GraphCanvas_PointerExited(object sender, PointerEventArgs e)

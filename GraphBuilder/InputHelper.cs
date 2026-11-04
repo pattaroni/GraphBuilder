@@ -6,46 +6,24 @@ namespace GraphBuilder
     // Розбір чисел і перевірка введених даних
     public class InputHelper
     {
-        public const double MaxValue = 1e9;
-        public const double MinRange = 1e-6;
+        // Більше точок будувати немає сенсу, програма почне гальмувати
         public const int MaxPoints = 50000;
 
         // Приймає число і з комою, і з крапкою
         public static bool TryParseNumber(string text, out double value)
         {
             value = 0;
-            if (string.IsNullOrWhiteSpace(text))
+            if (text == null)
             {
                 return false;
             }
 
             string number = text.Trim().Replace(',', '.');
-            if (!double.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out value))
-            {
-                return false;
-            }
-
-            return double.IsFinite(value);
+            bool correct = double.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+            return correct && double.IsFinite(value);
         }
 
-        // Повертає текст помилки або null, якщо все добре
-        public static string CheckNumber(string text, string fieldName)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return "Поле «" + fieldName + "» порожнє. Введіть число.";
-            }
-
-            double value;
-            if (!TryParseNumber(text, out value))
-            {
-                return "У полі «" + fieldName + "» має бути число.";
-            }
-
-            return null;
-        }
-
-        // Перевірка діапазонів. Повертає текст помилки або null
+        // Перевірка діапазонів. Повертає текст помилки або null, якщо все добре
         public static string CheckRange(double xMin, double xMax, double step, double yMin, double yMax)
         {
             if (xMin >= xMax)
@@ -60,18 +38,9 @@ namespace GraphBuilder
             {
                 return "Крок має бути більшим за нуль.";
             }
-            if (Math.Abs(xMin) > MaxValue || Math.Abs(xMax) > MaxValue
-                || Math.Abs(yMin) > MaxValue || Math.Abs(yMax) > MaxValue)
+            if (Math.Abs(xMin) > 1e9 || Math.Abs(xMax) > 1e9 || Math.Abs(yMin) > 1e9 || Math.Abs(yMax) > 1e9)
             {
-                return "Межі діапазону занадто великі. Допустимо не більше 1000000000 за модулем.";
-            }
-            if (xMax - xMin < MinRange || yMax - yMin < MinRange)
-            {
-                return "Діапазон занадто малий. Найменша ширина діапазону 0.000001.";
-            }
-            if (step > xMax - xMin)
-            {
-                return "Крок не може бути більшим за діапазон по X.";
+                return "Межі діапазону занадто великі (більше 1000000000 за модулем).";
             }
             if ((xMax - xMin) / step > MaxPoints)
             {
@@ -79,23 +48,6 @@ namespace GraphBuilder
             }
 
             return null;
-        }
-
-        // Запис числа для таблиці, файлу і рядка стану
-        public static string FormatNumber(double value)
-        {
-            if (!double.IsFinite(value))
-            {
-                return "не визначено";
-            }
-
-            double rounded = Math.Round(value, 6);
-            if (rounded == 0)
-            {
-                return "0";
-            }
-
-            return rounded.ToString("G10", CultureInfo.InvariantCulture);
         }
     }
 }
