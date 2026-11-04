@@ -15,17 +15,12 @@ namespace GraphBuilder.Functions
 
         public override string GetFormula()
         {
-            string bPart = "";
-            if (B > 0)
+            string formula = "y = " + A + "·x²";
+            if (B != 0)
             {
-                bPart = " + " + Num(B) + "·x";
+                formula += Signed(B) + "·x";
             }
-            else if (B < 0)
-            {
-                bPart = " − " + Num(-B) + "·x";
-            }
-
-            return "y = " + Num(A) + "·x²" + bPart + Signed(C);
+            return formula + Signed(C);
         }
     }
 }

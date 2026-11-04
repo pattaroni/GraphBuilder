@@ -17,7 +17,7 @@ namespace GraphBuilder.Functions
 
         public override string GetFormula()
         {
-            return "y = " + Num(A) + "·tg(" + Num(B) + "·x)" + Signed(C);
+            return "y = " + A + "·tg(" + B + "·x)" + Signed(C);
         }
 
         // Асимптоти там, де b·x = π/2 + π·k. Рахуємо номер k для обох точок:

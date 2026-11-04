@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace GraphBuilder.Functions
 {
     // Базовий клас для всіх функцій
@@ -28,26 +26,18 @@ namespace GraphBuilder.Functions
             return false;
         }
 
-        // Число для запису у формулі
-        protected string Num(double value)
-        {
-            return value.ToString("G6", CultureInfo.InvariantCulture);
-        }
-
         // Доданок зі знаком: " + 3" або " − 3". Нульовий доданок не показуємо
         protected string Signed(double value)
         {
-            if (value == 0)
-            {
-                return "";
-            }
-
             if (value > 0)
             {
-                return " + " + Num(value);
+                return " + " + value;
             }
-
-            return " − " + Num(-value);
+            if (value < 0)
+            {
+                return " − " + (-value);
+            }
+            return "";
         }
     }
 }

@@ -17,7 +17,7 @@ namespace GraphBuilder.Functions
 
         public override string GetFormula()
         {
-            return "y = " + Num(A) + "·cos(" + Num(B) + "·x)" + Signed(C);
+            return "y = " + A + "·cos(" + B + "·x)" + Signed(C);
         }
     }
 }

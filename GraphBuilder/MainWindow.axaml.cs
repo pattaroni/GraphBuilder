@@ -74,8 +74,9 @@ namespace GraphBuilder
 
             // Рядок у списку того самого кольору, що й графік
             TextBlock item = new TextBlock();
-            item.Text = graph.Function.GetFormula();
+            item.Text = graph.Function.Name + ": " + graph.Function.GetFormula();
             item.Foreground = new SolidColorBrush(graph.Color);
+            item.TextWrapping = TextWrapping.Wrap;
             GraphsListBox.Items.Add(item);
             GraphsListBox.SelectedIndex = GraphsListBox.Items.Count - 1;
 

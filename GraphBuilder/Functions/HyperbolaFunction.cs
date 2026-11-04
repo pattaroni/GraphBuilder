@@ -15,7 +15,7 @@ namespace GraphBuilder.Functions
 
         public override string GetFormula()
         {
-            return "y = " + Num(A) + " / (x" + Signed(-B) + ")" + Signed(C);
+            return "y = " + A + " / (x" + Signed(-B) + ")" + Signed(C);
         }
 
         // Асимптота у точці x = b
