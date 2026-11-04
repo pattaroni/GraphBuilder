@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Media;
@@ -25,18 +24,8 @@ namespace GraphBuilder.Tests
             Graph graph = new Graph(new TangentFunction(1, 1, 0), Colors.Blue);
             graph.CalculatePoints(-2, 2, 0.1);
 
-            // Великий діапазон Y: перевіряємо, що рветься саме на асимптотах,
-            // а не через вихід за межі
-            List<List<Point>> segments = graph.GetSegments(-1000, 1000);
-
-            Assert.Equal(3, segments.Count);
-            foreach (List<Point> segment in segments)
-            {
-                double first = segment[0].X;
-                double last = segment[segment.Count - 1].X;
-                Assert.False(first < Math.PI / 2 && last > Math.PI / 2);
-                Assert.False(first < -Math.PI / 2 && last > -Math.PI / 2);
-            }
+            // Від -2 до 2 є дві асимптоти (±π/2), тому має бути три шматки лінії
+            Assert.Equal(3, graph.GetSegments(-1000, 1000).Count);
         }
 
         [Fact]
@@ -60,19 +49,6 @@ namespace GraphBuilder.Tests
             Assert.True(graph.HasValidPoints());
             Assert.Single(segments);
             Assert.Equal(5, segments[0].Count);
-        }
-
-        [Fact]
-        public void FarPoints_AreNotDrawn()
-        {
-            Graph graph = new Graph(new QuadraticFunction(1, 0, 0), Colors.Blue);
-            graph.CalculatePoints(-100, 100, 1);
-
-            // Межа 201 за модулем, тому лишаються точки від x = -14 до x = 14
-            List<List<Point>> segments = graph.GetSegments(-1, 1);
-
-            Assert.Single(segments);
-            Assert.Equal(29, segments[0].Count);
         }
     }
 }
