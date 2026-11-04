@@ -176,7 +176,17 @@ namespace GraphBuilder
 
         private async Task ShowHelp()
         {
-            HelpWindow window = new HelpWindow();
+            string text = "Виберіть функцію, введіть коефіцієнти і діапазон, натисніть «Побудувати». "
+                + "Можна будувати кілька графіків, кожен своїм кольором. "
+                + "Числа можна писати і з комою, і з крапкою.\n\n"
+                + "Enter — побудувати графік\n"
+                + "Delete — видалити вибраний графік\n"
+                + "F1 — довідка\n"
+                + "Esc — закрити вікно\n\n"
+                + "Курсовий проєкт «Побудова графіків функцій».\n"
+                + "Виконав: Кирик О., гр. 585-КБ.";
+
+            MessageWindow window = new MessageWindow("Довідка", text, false);
             await window.ShowDialog(this);
         }
 
