@@ -3,7 +3,7 @@
         x:Class="GraphBuilder.MainWindow"
         Title="Побудова графіків функцій"
         Width="1100" Height="720"
-        MinWidth="820" MinHeight="680"
+        MinWidth="800" MinHeight="600"
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown">
 
@@ -85,21 +85,11 @@
 
             <ListBox x:Name="GraphsListBox" Grid.Row="6" BorderBrush="Gray" BorderThickness="1" />
 
-            <Grid Grid.Row="7" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto"
-                  ColumnSpacing="6" RowSpacing="6">
-                <Button x:Name="DeleteButton" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                        Content="Видалити вибраний" Click="DeleteButton_Click" />
-                <Button x:Name="ClearButton" Grid.Row="1" Grid.Column="0"
-                        Content="Очистити все" Padding="2,5" Click="ClearButton_Click" />
-                <Button x:Name="ValuesButton" Grid.Row="1" Grid.Column="1"
-                        Content="Таблиця" Padding="2,5" Click="ValuesButton_Click" />
-                <Button x:Name="SavePngButton" Grid.Row="2" Grid.Column="0"
-                        Content="Зберегти PNG" Padding="2,5" Click="SavePngButton_Click" />
-                <Button x:Name="SaveTxtButton" Grid.Row="2" Grid.Column="1"
-                        Content="Зберегти TXT" Padding="2,5" Click="SaveTxtButton_Click" />
-                <Button x:Name="HelpButton" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
-                        Content="Довідка (F1)" Click="HelpButton_Click" />
-            </Grid>
+            <StackPanel Grid.Row="7" Spacing="6">
+                <Button x:Name="DeleteButton" Content="Видалити вибраний" Click="DeleteButton_Click" />
+                <Button x:Name="ClearButton" Content="Очистити все" Click="ClearButton_Click" />
+                <Button x:Name="HelpButton" Content="Довідка (F1)" Click="HelpButton_Click" />
+            </StackPanel>
         </Grid>
 
         <!-- Полотно графіка -->
