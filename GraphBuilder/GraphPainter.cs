@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
@@ -11,6 +10,9 @@ namespace GraphBuilder
     // Малює сітку, осі та графіки на Canvas
     public class GraphPainter
     {
+        // На скільки частин ділимо кожну вісь
+        private const int TickCount = 10;
+
         private Canvas canvas;
 
         public double XMin { get; set; }
@@ -36,14 +38,8 @@ namespace GraphBuilder
                 return;
             }
 
-            // Кількість поділок залежить від розміру полотна
-            double xStep = GetTickStep(XMax - XMin, canvas.Bounds.Width / 70);
-            double yStep = GetTickStep(YMax - YMin, canvas.Bounds.Height / 50);
-            List<double> xTicks = GetTicks(XMin, XMax, xStep);
-            List<double> yTicks = GetTicks(YMin, YMax, yStep);
-
-            DrawGrid(xTicks, yTicks);
-            DrawAxes(xTicks, yTicks);
+            DrawGrid();
+            DrawAxes();
 
             foreach (Graph graph in graphs)
             {
@@ -72,146 +68,51 @@ namespace GraphBuilder
             return YMax - screenY / canvas.Bounds.Height * (YMax - YMin);
         }
 
-        // Вибирає крок поділок виду 1, 2 або 5, помножене на степінь десятки
-        private double GetTickStep(double range, double tickCount)
-        {
-            double roughStep = range / tickCount;
-            double power = Math.Pow(10, Math.Floor(Math.Log10(roughStep)));
-            double value = roughStep / power;
-
-            if (value < 1.5)
-            {
-                return power;
-            }
-            if (value < 3.5)
-            {
-                return 2 * power;
-            }
-            if (value < 7.5)
-            {
-                return 5 * power;
-            }
-            return 10 * power;
-        }
-
-        // Значення поділок від min до max. Кожне рахуємо як номер * крок,
-        // щоб не накопичувалась похибка
-        private List<double> GetTicks(double min, double max, double step)
-        {
-            List<double> ticks = new List<double>();
-            double first = Math.Ceiling(min / step);
-            double last = Math.Floor(max / step);
-            int count = (int)(last - first);
-
-            for (int i = 0; i <= count; i++)
-            {
-                ticks.Add((first + i) * step);
-            }
-
-            return ticks;
-        }
-
-        private void DrawGrid(List<double> xTicks, List<double> yTicks)
-        {
-            foreach (double x in xTicks)
-            {
-                double screenX = ToScreenX(x);
-                AddLine(screenX, 0, screenX, canvas.Bounds.Height, Brushes.LightGray, 1);
-            }
-
-            foreach (double y in yTicks)
-            {
-                double screenY = ToScreenY(y);
-                AddLine(0, screenY, canvas.Bounds.Width, screenY, Brushes.LightGray, 1);
-            }
-        }
-
-        private void DrawAxes(List<double> xTicks, List<double> yTicks)
+        private void DrawGrid()
         {
             double width = canvas.Bounds.Width;
             double height = canvas.Bounds.Height;
 
-            // Якщо нуль не потрапляє в діапазон, вісь малюємо по краю полотна
-            bool zeroInX = XMin <= 0 && XMax >= 0;
-            bool zeroInY = YMin <= 0 && YMax >= 0;
-            double axisX = 0;
-            double axisY = height - 1;
-            if (zeroInX)
+            for (int i = 0; i <= TickCount; i++)
             {
-                axisX = ToScreenX(0);
+                double x = width * i / TickCount;
+                double y = height * i / TickCount;
+                AddLine(x, 0, x, height, Brushes.LightGray, 1);
+                AddLine(0, y, width, y, Brushes.LightGray, 1);
             }
-            if (zeroInY)
-            {
-                axisY = ToScreenY(0);
-            }
+        }
+
+        // Осі проходять через нуль. Якщо нуля немає в діапазоні, вісь малюється по краю полотна
+        private void DrawAxes()
+        {
+            double width = canvas.Bounds.Width;
+            double height = canvas.Bounds.Height;
+            double axisX = Math.Clamp(ToScreenX(0), 0, width - 1);
+            double axisY = Math.Clamp(ToScreenY(0), 0, height - 1);
 
             AddLine(0, axisY, width, axisY, Brushes.Black, 1.5);
             AddLine(axisX, 0, axisX, height, Brushes.Black, 1.5);
 
-            DrawXTicks(xTicks, axisY, zeroInX);
-            DrawYTicks(yTicks, axisX, zeroInY);
-
-            // Підпис осі y зліва від осі, бо справа стоять числа
-            double nameX = axisX - 12;
-            if (nameX < 2)
+            for (int i = 0; i <= TickCount; i++)
             {
-                nameX = axisX + 40;
-            }
-            AddLabel("x", width - 12, axisY - 20);
-            AddLabel("y", nameX, 0);
-        }
-
-        private void DrawXTicks(List<double> xTicks, double axisY, bool zeroInX)
-        {
-            double width = canvas.Bounds.Width;
-
-            // Підписи під віссю, а якщо внизу немає місця, то над нею
-            double labelY = axisY + 5;
-            if (labelY > canvas.Bounds.Height - 20)
-            {
-                labelY = axisY - 20;
-            }
-
-            foreach (double x in xTicks)
-            {
+                double x = XMin + (XMax - XMin) * i / TickCount;
+                double y = YMin + (YMax - YMin) * i / TickCount;
                 double screenX = ToScreenX(x);
-                string text = FormatTick(x);
-                AddLine(screenX, axisY - 4, screenX, axisY + 4, Brushes.Black, 1);
-
-                double labelX = screenX - text.Length * 3;
-                if (x == 0 && zeroInX)
-                {
-                    labelX = screenX + 4;
-                }
-                labelX = Math.Clamp(labelX, 2, Math.Max(2, width - text.Length * 7));
-                AddLabel(text, labelX, labelY);
-            }
-        }
-
-        private void DrawYTicks(List<double> yTicks, double axisX, bool zeroInY)
-        {
-            double width = canvas.Bounds.Width;
-            double height = canvas.Bounds.Height;
-
-            foreach (double y in yTicks)
-            {
                 double screenY = ToScreenY(y);
+
+                // Поділки на осях
+                AddLine(screenX, axisY - 4, screenX, axisY + 4, Brushes.Black, 1);
                 AddLine(axisX - 4, screenY, axisX + 4, screenY, Brushes.Black, 1);
 
-                // Нуль уже підписаний на осі X
-                if (y == 0 && zeroInY)
-                {
-                    continue;
-                }
+                // Числа ставимо так, щоб вони не виходили за край полотна
+                AddLabel(FormatTick(x), Math.Min(screenX + 2, width - 45), Math.Min(axisY + 4, height - 18));
 
-                // Підписи справа від осі, а якщо там немає місця, то зліва
-                string text = FormatTick(y);
-                double labelX = axisX + 7;
-                if (labelX > width - 50)
+                // Нуль уже підписаний на осі X
+                string yText = FormatTick(y);
+                if (yText != "0")
                 {
-                    labelX = axisX - 7 - text.Length * 7;
+                    AddLabel(yText, Math.Min(axisX + 6, width - 45), Math.Min(screenY + 2, height - 18));
                 }
-                AddLabel(text, labelX, Math.Clamp(screenY - 8, 0, Math.Max(0, height - 16)));
             }
         }
 
@@ -239,7 +140,13 @@ namespace GraphBuilder
 
         private string FormatTick(double value)
         {
-            return value.ToString("G6", CultureInfo.InvariantCulture);
+            double rounded = Math.Round(value, 3);
+            // Щоб замість нуля не виводилось "-0"
+            if (rounded == 0)
+            {
+                rounded = 0;
+            }
+            return rounded.ToString();
         }
 
         private void AddLine(double x1, double y1, double x2, double y2, IBrush brush, double thickness)
